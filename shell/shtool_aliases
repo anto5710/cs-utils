@@ -1,0 +1,86 @@
+# @(#)Cshrc 1.1 86/01/06 SMI;
+#################################################################
+#                   Shell-script Toolset
+#                       ----------
+#                     at ~/util/shell
+#################################################################
+set ALIAS_def
+
+if ( $?UTIL_HOME && -d "${UTIL_HOME}" ) then
+    set CODELEINER = "${UTIL_HOME}/cl/codeleiner"
+    set TESTMAKE   = "${UTIL_HOME}/shell/testmake.sh"
+    set LSTEXT     = "${UTIL_HOME}/shell/lst.sh"
+    set WCL        = "${UTIL_HOME}/shell/wcL.sh"
+    set CLEAN      = "${UTIL_HOME}/shell/clean.sh"
+    set OMAKE      = "${UTIL_HOME}/shell/omake.sh"
+    set DOX        = "${UTIL_HOME}/shell/dox.sh"
+endif
+
+#################################################################
+## The codeleiner -- standard CS syntax enforcer 
+#################################################################
+if ( $?CODELEINER ) then
+    alias codelen 'bash ${CODELEINER}'
+    alias cl      "codelen"
+    alias cls     "codelen -s"
+    alias cll     "clear; codelen -s"
+endif
+
+#################################################################
+## The testmake -- test compiler per file
+#################################################################
+if ( $?TESTMAKE ) then
+    alias testmake 'bash ${TESTMAKE}'
+    alias tmake    "testmake"
+    alias tmakes   "testmake -s"
+endif
+
+#################################################################
+## lstext -- to list all tect files at depth 0
+#################################################################
+if ( $?LSTEXT ) then
+    alias lstext 'bash ${LSTEXT} --color=auto'
+    alias lstxt  "lstext"
+    alias lst    "lstext"
+endif
+
+#################################################################
+## wcL -- to assert 80 column limit via wc -L {}
+#################################################################
+if ( $?WCL ) then
+    alias wcL  'bash ${WCL}'
+    alias wcLs 'bash ${WCL} -s'
+    alias wcls 'bash ${WCL} -s'
+    alias wcl  'bash ${WCL} -s'
+endif
+
+#################################################################
+## clean -- to clean *.o and *.gch
+#################################################################
+if ( $?CLEAN ) then
+    alias clean   'sh ${CLEAN} -i'
+    alias cleanf  'sh ${CLEAN}'
+    alias cleanff 'sh ${CLEAN} -rf'
+endif
+
+#################################################################
+## omake
+#################################################################
+if ( $?OMAKE ) then
+    alias omake 'sh ${OMAKE}'
+    alias makeo "omake"  
+    alias mako  "omake"
+    alias mko   "omake"
+endif
+
+if ( $?DOX ) then
+    alias dox 'bash ${DOX}'
+endif
+
+#################################################################
+## remake
+#################################################################
+alias remake 'make clean; make'
+alias makef  'remake'
+alias maker  'remake'
+alias rmake  'remake'

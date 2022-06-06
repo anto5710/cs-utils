@@ -1,0 +1,221 @@
+#!/bin/bash
+# 
+# codeleiner
+# ------------------------------------------------------------------------------
+#
+# Author: Chris Ahn (dahn01)
+#
+#     A code width (<= 80 columns) and block height (<= 3) safeguard.
+# 
+#     Scans given text input to enforce width limit per line,
+#     and height limit per each outermost closure {}.
+#
+# -----------------------------------------------------------------------------
+#
+# Usage:
+#     codelen <TARGET_1> ... <TARGET_N>
+#      - executes for all targets (could be *.ext)
+#
+#     codelen
+#      - executes for all default types in pwd (.cpp, .h, README, .txt, .text)
+#
+#     codelen -update
+#      - recompiles source code: ./codelen.cpp to update
+#
+# ------------------------------------------------------------------------------
+
+ARGC="$#"
+PARENT="$(dirname "$BASH_SOURCE")"
+WIDTH="$(( `tput cols` < 80 ? `tput cols` : 80 ))"
+
+pad_center () {
+    HALF_FILL=""
+    NON_TEXT_WIDTH="$(( ${WIDTH} - ${#TEXT} ))"
+    HALF_FILL_WIDTH="$(( NON_TEXT_WIDTH / 2 ))"
+
+    for (( c=1; c<=${HALF_FILL_WIDTH}; c++ ))
+    do 
+        HALF_FILL="${HALF_FILL}${FILLER}"
+    done
+
+    PADDED="${HALF_FILL}${TEXT}${HALF_FILL}"
+}
+
+h_line () {
+    FILLER="━"; TEXT="";
+
+    pad_center
+    echo -e "\e[2m${PADDED}\e[22m"
+}
+
+dh_line () {
+    FILLER="-"; TEXT="";
+
+    pad_center
+    echo -e "\e[2m${PADDED}\e[22m"
+}
+
+print_title () {
+    TEMP_LIST=($TARGETS)
+    
+    
+    FILLER=" ";
+
+    HALF_FILL=""
+    LIST_CNT="${#TEMP_LIST[@]}"
+
+    if [ $SILENT == "true" ]
+    then
+        LIST_CNT="$(( ${LIST_CNT} - 1 ))"
+    fi
+
+    NON_TEXT=" cl ${LIST_CNT}/`ls | wc -l` files ... "
+    TEXT="\e[100;97m cl \e[1m${LIST_CNT}\
+\e[22m\e[2m/\e[22m`ls | wc -l` files ... \e[m"
+
+    NON_TEXT_WIDTH="$(( ${WIDTH} - ${#NON_TEXT} ))"
+    HALF_FILL_WIDTH="$(( NON_TEXT_WIDTH / 2 ))"
+
+    for (( c=1; c<=${HALF_FILL_WIDTH}; c++ ))
+    do 
+        HALF_FILL="${HALF_FILL}${FILLER}"
+    done
+
+    PADDED="${HALF_FILL}${TEXT}${HALF_FILL}"
+
+    # pad_center
+    echo -e "${PADDED}"
+}
+
+print_end () {
+    TEMP_LIST=($TARGETS)
+    
+    
+    FILLER=" ";
+
+    HALF_FILL=""
+
+    PASS_LESS=$(( $PASS_OUTPUTS > 0 ? 1 : 2 ))
+    WARN_LESS=$(( $FAIL_OUTPUTS > 0 ? 1 : 2 ))
+
+    NON_TEXT=" passed ${PASS_OUTPUTS}+${FAIL_OUTPUTS}/`ls | wc -l` files "
+    TEXT="\e[100;97m passed \e[${PASS_LESS};32m${PASS_OUTPUTS}\
+\e[39m\e[2m+\e[22;1m\e[31;${WARN_LESS}m${FAIL_OUTPUTS}\e[97m\
+\e[22m\e[2m/\e[22m`ls \
+| wc -l` files \e[m"
+
+    NON_TEXT_WIDTH="$(( ${WIDTH} - ${#NON_TEXT} ))"
+    HALF_FILL_WIDTH="$(( NON_TEXT_WIDTH / 2 ))"
+
+    for (( c=1; c<=${HALF_FILL_WIDTH}; c++ ))
+    do 
+        HALF_FILL="${HALF_FILL}${FILLER}"
+    done
+
+    PADDED="${HALF_FILL}${TEXT}${HALF_FILL}"
+
+    # pad_center
+    echo -e "${PADDED}"
+}
+
+EXEC="$PARENT/codelen"
+# DEFAULTS=""*.cpp" "*.h" "README" "README.*" "*.text" "*.txt"
+# "Makefile" "makefile""
+DEFAULTS="$(find * -maxdepth 0 -exec sh -c "file '{}' \
+| grep -q 'text'" \; -print)"
+# echo $d
+
+# Abort if core executable './codelen' does not exist
+if [ ! -e $EXEC ]
+then
+    echo "codeleiner: Exectuable $EXEC is not found."
+    exit 0
+fi
+
+# Recompile and update codelen.cpp, if requested with -update
+if [ $ARGC -eq 1 ] && [ $@ == "-update" ]
+then
+    echo "codeleiner: updating from $EXEC.cpp:"
+    if [ -f "$EXEC.cpp" ]
+    then 
+        clang++ -o $EXEC "$EXEC.cpp"
+        echo "codeleiner: successfully updated: $EXEC"
+    else
+        echo "codeleiner: failed to update: source file is not found: $EXEC.cpp"
+    fi
+
+    exit 0
+fi
+
+# By default, iterate for all args
+TARGETS="$@"
+WARN="true"
+SILENT="false"
+
+# But if no args, then go for defaults
+if [ $ARGC -eq 0 ]
+then 
+    TARGETS="$DEFAULTS"
+    WARN="false"
+fi
+
+if [ $ARGC -gt 0 ] && [ "$1" == "-s" ]
+then
+    ARGC=$(( ${ARGC} - 1 ))
+    WARN="false"
+    SILENT="true"
+    
+    if [ $ARGC -eq 0 ]
+    then
+        TARGETS="$DEFAULTS"
+    fi
+fi
+
+# Run ./codelen foreach in targets
+h_line
+print_title
+SH_OUTPUT=()
+PASS_OUTPUTS=0
+FAIL_OUTPUTS=0
+
+for arg in $TARGETS
+do
+    if [ -f $arg ]
+    then
+        EXEC_OUTPUT="`$EXEC $arg`"
+
+        if [[ ! $(echo ${EXEC_OUTPUT} | grep -E '\[FAIL_\w+\]' ) == "" ]] 
+        then
+            FAIL_OUTPUTS=$(( 1 + ${FAIL_OUTPUTS} ))
+        else 
+            PASS_OUTPUTS=$(( 1 + ${PASS_OUTPUTS} ))
+            SH_OUTPUT+=${EXEC_OUTPUT}
+        fi
+
+    else
+        if [ $WARN == "true" ] 
+        then echo "codeleiner: cannot find $arg"
+        fi
+    fi
+done
+
+if [ ! $SILENT == "true" ]
+then
+    # h_line
+    echo; echo
+    # echo "--------------------------------------------"
+    LT_OUTPUT=`printf '%s\t\n' "${SH_OUTPUT[@]}"`
+    echo ${LT_OUTPUT} | fold -w ${WIDTH} -s
+fi
+
+echo
+print_end
+FILLER="━"; TEXT="";
+pad_center
+
+if [ ${FAIL_OUTPUTS} -eq 0 ]
+then 
+    echo -e "\e[1;32m${PADDED}\e[m"
+else
+    echo -e "\e[2;31m${PADDED}\e[m"
+fi
