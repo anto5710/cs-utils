@@ -14,10 +14,11 @@ if ( $?UTIL_HOME && -d "${UTIL_HOME}" ) then
     set CLEAN      = "${UTIL_HOME}/shell/clean.sh"
     set OMAKE      = "${UTIL_HOME}/shell/omake.sh"
     set DOX        = "${UTIL_HOME}/shell/dox.sh"
+    set NOWER      = "${UTIL_HOME}/shell/nower.sh"
 endif
 
 #################################################################
-## The codeleiner -- standard CS syntax enforcer 
+## The CODELEINER -- standard CS syntax enforcer 
 #################################################################
 if ( $?CODELEINER ) then
     alias codelen 'bash ${CODELEINER}'
@@ -84,3 +85,16 @@ alias remake 'make clean; make'
 alias makef  'remake'
 alias maker  'remake'
 alias rmake  'remake'
+
+#################################################################
+## nower
+#################################################################
+if ( $?NOWER ) then
+    alias nower   'bash ${NOWER}'
+    alias now?    'nower'
+    alias now!    'nower'
+    alias now     'nower'
+    alias new?    'nower'
+    alias latest  'nower'
+    alias latest? 'nower'
+endif
