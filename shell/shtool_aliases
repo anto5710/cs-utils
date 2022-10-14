@@ -8,14 +8,15 @@ set ALIAS_def
 
 if ( $?UTIL_HOME && -d "${UTIL_HOME}" ) then
     set CODELEINER = "${UTIL_HOME}/cl/codeleiner"
-    set TESTMAKE   = "${UTIL_HOME}/shell/testmake.sh"
-    set LSTEXT     = "${UTIL_HOME}/shell/lst.sh"
-    set WCL        = "${UTIL_HOME}/shell/wcL.sh"
-    set CLEAN      = "${UTIL_HOME}/shell/clean.sh"
-    set OMAKE      = "${UTIL_HOME}/shell/omake.sh"
-    set DOX        = "${UTIL_HOME}/shell/dox.sh"
-    set NOWER      = "${UTIL_HOME}/shell/nower.sh"
-    set SPN        = "${UTIL_HOME}/shell/spn.sh"
+    set TESTMAKE   = "${SHTOOL_HOME}/testmake.sh"
+    set LSTEXT     = "${SHTOOL_HOME}/lst.sh"
+    set WCL        = "${SHTOOL_HOME}/wcL.sh"
+    set CLEAN      = "${SHTOOL_HOME}/clean.sh"
+    set OMAKE      = "${SHTOOL_HOME}/omake.sh"
+    set DOX        = "${SHTOOL_HOME}/dox.sh"
+    set NOWER      = "${SHTOOL_HOME}/nower.sh"
+    set SPN        = "${SHTOOL_HOME}/spn.sh"
+    set RMS        = "${SHTOOL_HOME}/rms.sh"
 endif
 
 #################################################################
@@ -108,4 +109,10 @@ if ( $?SPN ) then
     alias spn   'bash ${SPN}'
     alias sp    'spn -tt'
     alias spa   'spn -a -tt'
+endif
+
+if ( $?RMS ) then
+    alias rms   'bash ${RMS}'
+    alias rs    'rms'
+    alias rmsf  'rms -rf'
 endif

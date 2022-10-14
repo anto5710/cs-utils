@@ -2,7 +2,7 @@
 
 ARGC=$#
 APDC=0
-ARGS=$@
+ARGS=("$@")
 CMD=""
 B="\e[1m"
 I="\e[3m"
@@ -13,6 +13,9 @@ F_G="\e[32m"
 
 HEADER="${B}spn${R}"
 HADDER="   "
+
+EXIT_SUCCESS=0
+EXIT_FAILURE=1
 
 IS_ONSET="true"
 
@@ -29,15 +32,14 @@ abort_usage() {
     echo -e "${HADDER}  [FLAG]:="
 
     echo -e -n "${HADDER}   -a  | --a | --automatic"
-    echo -e "\tSmart mode. Resots to remote iff [CMD] query fails on local."
+    echo -e "\tSmart mode. Resorts to remote iff [CMD] query fails on local."
 
     echo -e -n "${HADDER}   -t  | -l  | --l | --live"
     echo -e "\tssh -t. Enables live-text I/O with the remote SSH."
 
     echo -e -n "${HADDER}   -tt | --llive"
-    echo -e\
-    "\t\tssh -t. Enables full ANSI-styled live-text I/O with the remote SSH."
-    exit
+    echo -e "\t\tssh -t. Enables full ANSI-styled live-text I/O with the remote SSH."
+    exit ${EXIT_FAILURE}
 }
 
 apply_switch() {
@@ -58,13 +60,13 @@ apply_switch() {
 append_cmd() {
     IS_ONSET="false"
     CMD="${CMD} ${ARGI}"
-    $((APDC++))
+    APDC=$((APDC + 1))
 }
 
 #=========================================================
 # Separates switchs/target paths
 #=========================================================
-for ARGI in ${ARGS}; do
+for ARGI in "${ARGS[@]}"; do
     case ${ARGI} in
     \\-*)
         append_cmd
@@ -98,7 +100,7 @@ REMOTE_HOST_Q=".*tufts.edu"
 REMOTE_HOST="dahn01@homework.cs.tufts.edu"
 
 LOCAL_ROOT="/home/anto5710/cs/"
-LOCAL_PWD="$(pwd)"
+LOCAL_PWD="$(pwd)/"
 LOCAL_RELATIVE=""
 
 REMOTE_ROOT="/h/dahn01/"
@@ -127,7 +129,7 @@ state_on_where() {
 
 print_offseter() {
     echo -e "${HEADER}: remoting...: ${F_R}\"${LOCAL_PWD_R_ALIGNED%/}/\"${R}"
-    echo -e "             ···> ${F_G}\"${REMOTE_PWD_R_ALIGNED%/}/\"${R}"
+    echo -e "             ---> ${F_G}\"${REMOTE_PWD_R_ALIGNED%/}/\"${R}"
     echo -e "-------------------------------------------------------------"
 }
 
@@ -156,7 +158,7 @@ right_align_paths() {
 
 locate_remote_pwd() {
     LOCAL_RELATIVE="${LOCAL_PWD#"${LOCAL_ROOT}"}"
-    REMOTE_PWD="${REMOTE_ROOT}${LOCAL_RELATIVE}"
+    REMOTE_PWD="${REMOTE_ROOT%/}/${LOCAL_RELATIVE#/}"
 }
 
 query_cmd_on_local() {
@@ -181,10 +183,6 @@ query_cmd_on_local() {
 
 state_on_where
 
-if [[ "${X_LIVE_TEXT}" == true ]]; then
-    SSH_FLAGS="-t"
-fi
-
 if [[ "${X_AUTOMATIC}" == true ]]; then
     query_cmd_on_local
     if [[ "${LOCAL_QUERY_SUCCESS}" == "true" ]]; then
@@ -196,8 +194,15 @@ if [[ "${ON}" == "${REMOTE}" ]]; then
     eval ${CMD}
 else # on remote:
     locate_remote_pwd
+
+    if [[ "${LOCAL_PWD}" != ${LOCAL_ROOT}* ]]; then
+        echo -e "${HEADER}: Cannot calibrate outside the root: ${LOCAL_ROOT}"
+        exit
+    fi
     right_align_paths
     print_offseter
 
     ssh ${SSH_MODE} "${REMOTE_HOST}" "cd ${REMOTE_PWD}; eval '${CMD}'"
 fi
+
+exit ${EXIT_SUCCESS}
