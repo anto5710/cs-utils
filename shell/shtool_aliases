@@ -15,6 +15,7 @@ if ( $?UTIL_HOME && -d "${UTIL_HOME}" ) then
     set OMAKE      = "${UTIL_HOME}/shell/omake.sh"
     set DOX        = "${UTIL_HOME}/shell/dox.sh"
     set NOWER      = "${UTIL_HOME}/shell/nower.sh"
+    set SPN        = "${UTIL_HOME}/shell/spn.sh"
 endif
 
 #################################################################
@@ -97,4 +98,14 @@ if ( $?NOWER ) then
     alias new?    'nower'
     alias latest  'nower'
     alias latest? 'nower'
+endif
+
+#################################################################
+## spn
+#################################################################
+
+if ( $?SPN ) then
+    alias spn   'bash ${SPN}'
+    alias sp    'spn -tt'
+    alias spa   'spn -a -tt'
 endif
