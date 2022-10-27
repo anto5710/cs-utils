@@ -27,10 +27,10 @@ print_compile_result() {
     if [ -z "$COMPILE_OUTPUT" ]
     then
         if [ ! $SILENT == "true" ]
-        then 
+        then
             echo -e -n "${HEADER}successfully compiled \
 \e[4;1;3m${FILE}\e[m -> \e[32;4;1;3m${FILE_DEST}\e[m\t"
-            
+
         fi
         PASS_FILES="$(($PASS_FILES + 1))"
     else
@@ -42,8 +42,8 @@ print_compile_result() {
 clean () {
     if [ -f $FILE_DEST ]
     then
-        if [ ! $SILENT == "true" ]; then 
-            echo -e "\e[2m ... (cleaning) \e[m"; 
+        if [ ! $SILENT == "true" ]; then
+            echo -e "\e[2m ... (cleaning) \e[m";
         fi
         rm ${FILE_DEST}
     else
@@ -57,7 +57,7 @@ double_clean () {
 
 print_summary() {
     if [ $((PASS_FILES + FAIL_FILES)) -gt 0 ]
-    then 
+    then
         echo -e "${HEADER}\
 Compiled: \e[32;1m${PASS_FILES}\e[m / \
 Erred: \e[31;1m${FAIL_FILES}\e[m files"
@@ -103,5 +103,5 @@ do
 done
 
 double_clean
-print_summary 
+print_summary
 

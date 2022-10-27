@@ -1,5 +1,8 @@
 #!/bin/bash
 
+#==============================================================
+# Total (maximum) columns. Beep if violative
+#==============================================================
 ARGC=$#
 APDC=0
 ARGS=("$@")
@@ -19,14 +22,21 @@ EXIT_FAILURE=1
 
 IS_ONSET="true"
 
+#==============================================================
+# Total (maximum) columns. Beep if violative
+#==============================================================
 PAD_N() {
     START=0
     PAD="$(for ((i = $START; i < $N; i++)); do echo -n " "; done)"
 }
 
 X_AUTOMATIC=""
+X_SYNC=""
 SSH_MODE=""
 
+#==============================================================
+# Total (maximum) columns. Beep if violative
+#==============================================================
 abort_usage() {
     echo -e "${HEADER}: Usage: ${I}spn${R} [FLAGS...] [CMD...]"
     echo -e "${HADDER}  [FLAG]:="
@@ -39,9 +49,16 @@ abort_usage() {
 
     echo -e -n "${HADDER}   -tt | --llive"
     echo -e "\t\tssh -t. Enables full ANSI-styled live-text I/O with the remote SSH."
+
+    echo -e -n "${HEADER}   -s  | --s | --sync | -b | --b | --both"
+    echo -e "\tSyncronization mode. Runs the command on both local (then) remote"
+
     exit ${EXIT_FAILURE}
 }
 
+#==============================================================
+# Total (maximum) columns. Beep if violative
+#==============================================================
 apply_switch() {
     case ${ARGI} in
     -t | -l | --l | --live)
@@ -53,10 +70,16 @@ apply_switch() {
     -a | --a | --automatic)
         X_AUTOMATIC="true"
         ;;
+    -s | --s | --sync | -b | --b | --both )
+        X_SYNC="true"
+        ;;
     *) ;;
     esac
 }
 
+#==============================================================
+# Total (maximum) columns. Beep if violative
+#==============================================================
 append_cmd() {
     IS_ONSET="false"
     CMD="${CMD} ${ARGI}"
@@ -103,7 +126,7 @@ LOCAL_ROOT="/home/anto5710/cs/"
 LOCAL_PWD="$(pwd)/"
 LOCAL_RELATIVE=""
 
-REMOTE_ROOT="/h/dahn01/"
+REMOTE_ROOT="/h/dahn01/cs/"
 REMOTE_PWD=""
 
 SSH_FLAGS=""
@@ -190,9 +213,18 @@ if [[ "${X_AUTOMATIC}" == true ]]; then
     fi
 fi
 
+if [[ "${X_SYNC}" == true ]]; then
+    ON="${LOCAL}"
+fi
+
 if [[ "${ON}" == "${REMOTE}" ]]; then
     eval ${CMD}
 else # on remote:
+    if [[ "${X_SYNC}" == "true" ]]; then
+        eval ${CMD}
+        echo -e "-------------------------------------------------------------"
+    fi
+
     locate_remote_pwd
 
     if [[ "${LOCAL_PWD}" != ${LOCAL_ROOT}* ]]; then

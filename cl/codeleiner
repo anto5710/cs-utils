@@ -71,7 +71,7 @@ print_title () {
 
     NON_TEXT=" cl ${LIST_CNT}/`ls | wc -l` files ... "
     TEXT="\e[100;97m cl \e[1m${LIST_CNT}\
-\e[22m\e[2m/\e[22m`ls | wc -l` files ... \e[m"
+\e[22m\e[100m/\e[22m`ls | wc -l` files ... \e[m"
 
     NON_TEXT_WIDTH="$(( ${WIDTH} - ${#NON_TEXT} ))"
     HALF_FILL_WIDTH="$(( NON_TEXT_WIDTH / 2 ))"
@@ -99,9 +99,9 @@ print_end () {
     WARN_LESS=$(( $FAIL_OUTPUTS > 0 ? 1 : 2 ))
 
     NON_TEXT=" passed ${PASS_OUTPUTS}+${FAIL_OUTPUTS}/`ls | wc -l` files "
-    TEXT="\e[100;97m passed \e[${PASS_LESS};32m${PASS_OUTPUTS}\
-\e[39m\e[2m+\e[22;1m\e[31;${WARN_LESS}m${FAIL_OUTPUTS}\e[97m\
-\e[22m\e[2m/\e[22m`ls \
+    TEXT="\e[100;97m passed \e[${PASS_LESS};100;32m${PASS_OUTPUTS}\
+\e[39;100;m\e[100m+\e[22;100;1m\e[31;100;${WARN_LESS}m${FAIL_OUTPUTS}\e[100;97m\
+\e[100;22m\e[100m/\e[100;22m`ls \
 | wc -l` files \e[m"
 
     NON_TEXT_WIDTH="$(( ${WIDTH} - ${#NON_TEXT} ))"
@@ -189,7 +189,7 @@ do
             FAIL_OUTPUTS=$(( 1 + ${FAIL_OUTPUTS} ))
         else 
             PASS_OUTPUTS=$(( 1 + ${PASS_OUTPUTS} ))
-            SH_OUTPUT+=${EXEC_OUTPUT}
+            SH_OUTPUTf=${EXEC_OUTPUT}
         fi
 
     else

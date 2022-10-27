@@ -17,6 +17,7 @@ if ( $?UTIL_HOME && -d "${UTIL_HOME}" ) then
     set NOWER      = "${SHTOOL_HOME}/nower.sh"
     set SPN        = "${SHTOOL_HOME}/spn.sh"
     set RMS        = "${SHTOOL_HOME}/rms.sh"
+    set NONON      = "${SHTOOL_HOME}/nonon.sh"
 endif
 
 #################################################################
@@ -109,10 +110,18 @@ if ( $?SPN ) then
     alias spn   'bash ${SPN}'
     alias sp    'spn -tt'
     alias spa   'spn -a -tt'
+    alias sps   'spn -tt -s'
 endif
 
 if ( $?RMS ) then
     alias rms   'bash ${RMS}'
     alias rs    'rms'
     alias rmsf  'rms -rf'
+endif
+
+if ( $?NONON ) then
+    alias nonon 'bash ${NONON}'
+    
+    alias no    'nonon'
+    alias non   'nonon'
 endif

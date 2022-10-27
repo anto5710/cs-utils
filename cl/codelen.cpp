@@ -105,9 +105,20 @@ CodeStream::CodeStream(istream &input_ref, string name)
     input_p    = &input_ref;
 }
 
+
+const size_t TAB_SIZE = 8;
+
 bool CodeStream::assertColumn()
 {
-    if (line.length() > MAX_COLUMNS) {
+
+    size_t len = line.length();
+    for (char c : line) {
+        if (c == '\t') {
+            len += (TAB_SIZE - 1);
+        }
+    }
+
+    if (len > MAX_COLUMNS) {
 
         size_t starti       = line.find_first_not_of(" \n\r\t\f\v");
         string trimmed_line = (starti == std::string::npos)
@@ -116,7 +127,7 @@ bool CodeStream::assertColumn()
 
         ostringstream outs;
         outs << " \e[1mline:" << line_no << "\e[22;39;2m: "
-             << "\t(\e[22;1;31m" << line.length() << "\e[22;39m cols):\e[2m\t"
+             << "\t(\e[22;1;31m" << len << "\e[22;39m cols):\e[2m\t"
              << trimmed_line << "[...]"
              << "\e[22m" << endl;
 

@@ -29,6 +29,12 @@ done
 # If no target, default to *.o *.gch ....
 #========================================================
 if [ -z "$TARGETS" ]; then
+    if [ -e "Makefile" ]; then
+        printf "${HEADER} Resolving to Makefile::clean\n"
+        make clean
+        exit
+    fi
+
     TARGETS=`find * -maxdepth    0\
             -name "*.o"         -o\
             -name "*.gch"       -o\
