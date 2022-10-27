@@ -30,7 +30,7 @@ INT_MAINX="int[\s\n]*main[\s\n]*\([\s\n]*(int[\s\n]+[\_a-zA-Z][\w\_]*[\s\n]*\,\
 [\s\n]*(char[\s\n]*\*[\s\n]*[\_a-zA-Z][\w\_]*[\s\n]*\[[\s\n]*\]|\
 char[\s\n]*\*[\s\n]*\*[\s\n]*[\_a-zA-Z][\w\_]*[\s\n]*))?[\s\n]*\)[\s\n]*"
 
-FILES=(*)
+FILES=( * )
 
 PRIMAIN=""
 PRIMAIN_OUT=""
@@ -42,8 +42,6 @@ PWD=$(pwd)
 
 time_sorted_ls() {
     # echo "${FIND_FLAGS[@]}"
-    find -maxdepth 1 -type f -iname '*.cpp'
-
     while read -r -d '' _ file; do
         PRIMAIN_CANDIDATES+=("${file##"./"}")
     done < <(find -maxdepth 1 -type f -iname '*.cpp' \
@@ -78,10 +76,6 @@ else
 
     PRIMAIN_OUT="${PRIMAIN%%.*}"
 
-    while [[ -e "${PRIMAIN_OUT}" ]]; do
-        PRIMAIN_OUT+=".out"
-    done
-
     echo -e "${HEADER} Compile executable ---> ${U}${W}${PWD}${NW}/${F_G}${I}${PRIMAIN_OUT}${R}"
 fi
 
@@ -92,22 +86,24 @@ declare -A DEPS
 DEPS_L="${PRIMAIN}"
 DEPS_FL="${B}${I}${U}${PRIMAIN}${R}"
 
+stash_ss() {
+    DEPS["${SOURCE%%.*}"]=1
+    DEPS_L+=" ${SOURCE}"
+    DEPS_FL+=" ${U}${SOURCE}${R}"
+}
+
 stash_source() {
     H_BASENAME="${header%%.h}"
 
-    if [[ -e "${H_BASENAME}.o" ]]; then
-        if [[ ! "${DEPS[${H_BASENAME}.o]}" ]] && [[ ! "${DEPS[${H_BASENAME}.cpp]}" ]]; then
-            DEPS["${H_BASENAME}.o"]=1
-            DEPS_L+=" ${H_BASENAME}.o"
-            DEPS_FL+=" ${U}${H_BASENAME}.o${R}"
-        fi
-    fi
-
-    if [[ -e "${H_BASENAME}.cpp" ]]; then
-        if [[ ! "${DEPS[${H_BASENAME}.o]}" ]] && [[ ! "${DEPS[${H_BASENAME}.cpp]}" ]]; then
-            DEPS["${H_BASENAME}.cpp"]=1
-            DEPS_L+=" ${H_BASENAME}.cpp"
-            DEPS_FL+=" ${U}${H_BASENAME}.cpp${R}"
+    if [[ ! "${DEPS[${H_BASENAME}]}" ]]; then
+        if [[ -e "${H_BASENAME}.o" ]]; then
+            SOURCE="${H_BASENAME}.o"
+            stash_ss
+        else
+            if [[ -e "${H_BASENAME}.cpp" ]]; then
+                SOURCE="${H_BASENAME}.cpp"
+                stash_ss
+            fi
         fi
     fi
 
@@ -129,7 +125,6 @@ while [[ V_I -lt ${#TO_VISITS[@]} ]]; do
         [[ "${VISITEDS[${file}]}" ]]; then
         continue
     fi
-    echo visti "${file}"
 
     while IFS= read -r header; do
         stash_source
@@ -139,5 +134,9 @@ while [[ V_I -lt ${#TO_VISITS[@]} ]]; do
 done
 
 echo -e "${HEADER} Collected: ${DEPS_FL}"
+echo -e "${CXX} ${W}${CXXFLAGS}${NW} -o ${F_G}${I}${PRIMAIN_OUT}${R} ${DEPS_FL}"
+echo -e "----------------------------------------------------------------------"
 
 ${CXX} ${CXXFLAGS} -o ${PRIMAIN_OUT} ${DEPS_L}
+
+./${PRIMAIN_OUT}

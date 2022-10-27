@@ -12,7 +12,7 @@ if ( $?UTIL_HOME && -d "${UTIL_HOME}" ) then
     set LSTEXT     = "${SHTOOL_HOME}/lst.sh"
     set WCL        = "${SHTOOL_HOME}/wcL.sh"
     set CLEAN      = "${SHTOOL_HOME}/clean.sh"
-    set OMAKE      = "${SHTOOL_HOME}/omake.sh"
+    set OMAKE      = "${SHTOOL_HOME}/omake2.sh"
     set DOX        = "${SHTOOL_HOME}/dox.sh"
     set NOWER      = "${SHTOOL_HOME}/nower.sh"
     set SPN        = "${SHTOOL_HOME}/spn.sh"
@@ -21,7 +21,7 @@ if ( $?UTIL_HOME && -d "${UTIL_HOME}" ) then
 endif
 
 #################################################################
-## The CODELEINER -- standard CS syntax enforcer 
+## The CODELEINER -- standard CS syntax enforcer
 #################################################################
 if ( $?CODELEINER ) then
     alias codelen 'bash ${CODELEINER}'
@@ -71,8 +71,9 @@ endif
 ## omake
 #################################################################
 if ( $?OMAKE ) then
-    alias omake 'sh ${OMAKE}'
-    alias makeo "omake"  
+    alias omake 'bash ${OMAKE}'
+    alias okabe 'omake'
+    alias makeo "omake"
     alias mako  "omake"
     alias mko   "omake"
 endif
@@ -121,7 +122,7 @@ endif
 
 if ( $?NONON ) then
     alias nonon 'bash ${NONON}'
-    
+
     alias no    'nonon'
     alias non   'nonon'
 endif
