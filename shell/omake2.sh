@@ -282,6 +282,7 @@ final_compile() {
 #========================================================
 # COMPILE & EXECUTE
 #========================================================
+stash_all_from_premain
 final_compile
 ./${PRIMAIN_OUT}
 
