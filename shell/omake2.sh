@@ -1,6 +1,5 @@
 #!/bin/bash
 
-HEADER="${B}omake:${R}"
 
 #========================================================
 #                 ANSI STYLING TABLE
@@ -11,7 +10,10 @@ I="\e[3m"
 R="\e[m"
 W="\e[2m"
 NW="\e[22m"
+ER="\a"
 F_G="\e[32m"
+
+HEADER="${B}omake:${R}"
 
 #========================================================
 #                   COMPILER SETUP
@@ -106,7 +108,7 @@ on_found_blue() {
 }
 
 on_no_blues_abort() {
-    echo -e "${HEADER} Unable to locate a primain (.cpp)."
+    echo -e "${HEADER} Unable to locate a primain (.cpp).${ER}"
     exit 1
 }
 
@@ -133,12 +135,20 @@ TO_VISIT_Q=("${PRIMAIN}")
 DEP_LIST="${PRIMAIN}"
 DEP_LIST_FANCY="${B}${I}${U}${PRIMAIN}${R}"
 
+H_SOURCE_UPDATE_REQ=""
+H_SOURCE_VANACY="vacant"
+
+H_V_VACANT="vacant"
+H_V_ACCEPTING="accepting"
+H_V_OCCUPIED="occupied"
+
 #========================================================
 # Enqueue files to later visit, in-order
 #========================================================
 enqueue_includes() {
     for cur_source in “${H_ASSOCIATES[@]}“; do
-        if [[ -e "${cur_source}" ]]; then
+        if [[ -e "${cur_source}"           ]]  \
+        && [[  ! "${VISITED_SET[${file}]}" ]]; then
             TO_VISIT_Q+=("${cur_source}")
         fi
     done
@@ -151,23 +161,38 @@ enqueue_includes() {
 # and collect the latest modified 'source' type file {.cpp, .c}.
 #========================================================
 search_latest_source() {
-    for cur_source in "${H_ASSOCIATES[@]}"; do
-        if [[ -e ${cur_source} ]]; then
-            CUR_LAST_UNIXTIME=$(date -r "${cur_source}" +"%s") \
+    H_SOURCE_SET="${H_V_VACANT}"
+
+    for CUR_SOURCE in "${H_ASSOCIATES[@]}"; do
+        if [[ -e "${CUR_SOURCE}" ]]; then
+            CUR_LAST_UNIXTIME=$(date -r "${CUR_SOURCE}" +"%s") \
          || CUR_LAST_UNIXTIME=0
 
             #---------------------------------------------------
             # Update if newer than preivous top modified time
             #---------------------------------------------------
-            if [[ ${CUR_LAST_UNIXTIME} -gt ${TOP_LAST_UNIXTIME} ]]; then
+            if [[ ${CUR_LAST_UNIXTIME} -ge ${TOP_LAST_UNIXTIME} ]]; then
                 TOP_LAST_UNIXTIME="${CUR_LAST_UNIXTIME}"
+                H_SOURCE_UPDATE_REQ="1"
 
-                #-----------------------------------------------
-                # Set new source file if newer & is of source type
-                #-----------------------------------------------
-                if [[ "${cur_source}" =~ ${SOURCE_TYPEX} ]]; then
-                    TOP_LAST_SOURCE="${cur_source}"
+                if [[ "${H_SOURCE_SET}" == "${H_V_VACANT}" ]]; then
+                    H_SOURCE_SET="${H_V_ACCEPTING}"
                 fi
+            else
+                H_SOURCE_UPDATE_REQ=""
+            fi
+
+            #-----------------------------------------------
+            # Set new source file if newer & is of source type
+            #-----------------------------------------------
+            if  [[ "${CUR_SOURCE}" =~ ${SOURCE_TYPEX} ]]         \
+            && (   [[ "${H_SOURCE_SET}" == "${H_V_ACCEPTING}" ]] \
+                || [[ "${H_SOURCE_UPDATE_REQ}"                ]]); then
+
+                echo -e "${HEADER} Recompiling -c        : ${U}${CUR_SOURCE}${R}"
+
+                TOP_LAST_SOURCE="${CUR_SOURCE}"
+                H_SOURCE_SET="${H_V_OCCUPIED}"
             fi
         fi
     done
@@ -178,22 +203,25 @@ search_latest_source() {
 # then finally append .o to the args.
 #========================================================
 compile_append_source() {
-    if [[ ! -z "${TOP_LAST_SOURCE}" ]]  \
-    && [[   -e "${TOP_LAST_SOURCE}" ]]; then
-        #------------------------------------------------
-        # Compile -c if non .o file
-        #------------------------------------------------
-        if ! [[ "${TOP_LAST_SOURCE}" =~ .*\.o ]]; then
-            ${CXX} ${CXXFLAGS} -c ${TOP_LAST_SOURCE} -o "${H_BASENAME}.o"
-            TOP_LAST_SOURCE="${H_BASENAME}.o"
-        fi
+    if [[ ! -z "${TOP_LAST_SOURCE}" ]]; then
+        if [[ -e "${TOP_LAST_SOURCE}" ]]; then
+            #--------------------------------------------
+            # Compile -c if non .o file
+            #--------------------------------------------
+            if ! [[ "${TOP_LAST_SOURCE}" =~ .*\.o ]]; then
+                ${CXX} ${CXXFLAGS} -c ${TOP_LAST_SOURCE} -o "${H_BASENAME}.o"
+                TOP_LAST_SOURCE="${H_BASENAME}.o"
+            fi
 
-        #------------------------------------------------
-        # Add the top source select to dep lists & mark it appended
-        #------------------------------------------------
-        DEP_BASE_SET["${H_BASENAME}"]=1
-        DEP_LIST+=" ${TOP_LAST_SOURCE}"
-        DEP_LIST_FANCY+=" ${U}${TOP_LAST_SOURCE}${R}"
+            #--------------------------------------------
+            # Add the top source select to dep lists & mark it appended
+            #--------------------------------------------
+            DEP_BASE_SET["${H_BASENAME}"]=1
+            DEP_LIST+=" ${TOP_LAST_SOURCE}"
+            DEP_LIST_FANCY+=" ${U}${TOP_LAST_SOURCE}${R}"
+        else
+            echo -e "${HEADER} Dependency not found: ${TOP_LAST_SOURCE}"
+        fi
     fi
 }
 
@@ -204,7 +232,7 @@ compile_append_source() {
 # and append to the dep args.
 #========================================================
 stash_associateds() {
-    H_BASENAME="${H_HEADER%%.h}"
+    H_BASENAME="${H_HEADER%%.*}"
     H_ASSOCIATES=(
         "${H_HEADER}"       \
         "${H_BASENAME}.cpp" \
@@ -254,8 +282,8 @@ stash_all_from_premain() {
         #------------------------------------------------
         # Handle iff it's a text file & not visited yet
         #------------------------------------------------
-        if [[ ! "$(file ${file})" =~ .*text ]] \
-        || [[   "${VISITED_SET[${file}]}"   ]]; then
+        if ! [[ "$(file ${file})" =~ .*text ]] \
+        ||   [[   "${VISITED_SET[${file}]}" ]]; then
             continue
         fi
 
@@ -279,11 +307,15 @@ final_compile() {
 }
 
 
+on_exec_exit_failure() {
+    echo -e "${HEADER} Executable exited with a failure: ${PRIMAIN_OUT}${ER}"
+}
+
 #========================================================
 # COMPILE & EXECUTE
 #========================================================
 stash_all_from_premain
 final_compile
-./${PRIMAIN_OUT}
+./${PRIMAIN_OUT} || on_exec_exit_failure
 
 exit 0
