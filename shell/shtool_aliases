@@ -2,22 +2,24 @@
 #################################################################
 #                   Shell-script Toolset
 #                       ----------
-#                     at ~/util/shell
+#                    at ~/cs-utils/shell
 #################################################################
 set ALIAS_def
 
 if ( $?UTIL_HOME && -d "${UTIL_HOME}" ) then
-    set CODELEINER = "${UTIL_HOME}/cl/codeleiner"
-    set TESTMAKE   = "${SHTOOL_HOME}/testmake.sh"
-    set LSTEXT     = "${SHTOOL_HOME}/lst.sh"
-    set WCL        = "${SHTOOL_HOME}/wcL.sh"
-    set CLEAN      = "${SHTOOL_HOME}/clean.sh"
-    set OMAKE      = "${SHTOOL_HOME}/omake2.sh"
-    set DOX        = "${SHTOOL_HOME}/dox.sh"
-    set NOWER      = "${SHTOOL_HOME}/nower.sh"
-    set SPN        = "${SHTOOL_HOME}/spn.sh"
-    set RMS        = "${SHTOOL_HOME}/rms.sh"
-    set NONON      = "${SHTOOL_HOME}/nonon.sh"
+    set CODELEINER  = "${UTIL_HOME}/cl/codeleiner"
+    set TESTMAKE    = "${SHTOOL_HOME}/testmake.sh"
+    set LSTEXT      = "${SHTOOL_HOME}/lst.sh"
+    set WCL         = "${SHTOOL_HOME}/wcL.sh"
+    set CLEAN       = "${SHTOOL_HOME}/clean.sh"
+    set OMAKE       = "${SHTOOL_HOME}/omake2.sh"
+    set DOX         = "${SHTOOL_HOME}/dox.sh"
+    set NOWER       = "${SHTOOL_HOME}/nower.sh"
+    set SPN         = "${SHTOOL_HOME}/spn.sh"
+    set RMS         = "${SHTOOL_HOME}/rms.sh"
+    set NONON       = "${SHTOOL_HOME}/nonon.sh"
+    set DEDUPLICATE = "${SHTOOL_HOME}/deduplicate.sh"
+    set CPASTE_HALLIGAN = "${SHTOOL_HOME}/cpaste_halligan.sh"
 endif
 
 #################################################################
@@ -95,12 +97,12 @@ alias rmake  'remake'
 #################################################################
 if ( $?NOWER ) then
     alias nower   'bash ${NOWER}'
-    alias now?    'nower'
+    alias now?    'nower -q'
     alias now!    'nower'
     alias now     'nower'
-    alias new?    'nower'
+    alias new?    'nower -q'
     alias latest  'nower'
-    alias latest? 'nower'
+    alias latest? 'nower -q'
 endif
 
 #################################################################
@@ -109,9 +111,17 @@ endif
 
 if ( $?SPN ) then
     alias spn   'bash ${SPN}'
+
     alias sp    'spn -tt'
-    alias spa   'spn -a -tt'
+    alias spa   'spn -tt -a'
     alias sps   'spn -tt -s'
+
+    alias spb   'spn -tt -b'
+    alias spp   'spb'
+
+    alias rmb   'spb rm'
+    alias mvb   'spb mv'
+    alias mb    'mvb'
 endif
 
 if ( $?RMS ) then
@@ -125,4 +135,14 @@ if ( $?NONON ) then
 
     alias no    'nonon'
     alias non   'nonon'
+endif
+
+if ( $?DEDUPLICATE ) then
+    alias deduplicate 'bash ${DEDUPLICATE}'
+    alias dedup       'deduplicate'
+endif
+
+if ( $?CPASTE_HALLIGAN ) then
+    alias cpaste_halligan 'bash ${CPASTE_HALLIGAN}'
+    alias cpaste          'cpaste_halligan'
 endif

@@ -134,6 +134,7 @@ TO_VISIT_Q=("${PRIMAIN}")
 
 DEP_LIST="${PRIMAIN}"
 DEP_LIST_FANCY="${B}${I}${U}${PRIMAIN}${R}"
+DEP_BASE_SET["${PRIMAIN%%.*}"]=1
 
 H_SOURCE_UPDATE_REQ=""
 H_SOURCE_VANACY="vacant"
@@ -189,7 +190,7 @@ search_latest_source() {
             && (   [[ "${H_SOURCE_SET}" == "${H_V_ACCEPTING}" ]] \
                 || [[ "${H_SOURCE_UPDATE_REQ}"                ]]); then
 
-                echo -e "${HEADER} Recompiling -c        : ${U}${CUR_SOURCE}${R}"
+                echo -e "${HEADER}        Recompiling -c : ${U}${CUR_SOURCE}${R}"
 
                 TOP_LAST_SOURCE="${CUR_SOURCE}"
                 H_SOURCE_SET="${H_V_OCCUPIED}"
