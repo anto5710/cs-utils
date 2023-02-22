@@ -20,6 +20,7 @@ if ( $?UTIL_HOME && -d "${UTIL_HOME}" ) then
     set NONON       = "${SHTOOL_HOME}/nonon.sh"
     set DEDUPLICATE = "${SHTOOL_HOME}/deduplicate.sh"
     set CPASTE_HALLIGAN = "${SHTOOL_HOME}/cpaste_halligan.sh"
+    set CODELINES   = "${SHTOOL_HOME}/codelines.sh"
 endif
 
 #################################################################
@@ -145,4 +146,10 @@ endif
 if ( $?CPASTE_HALLIGAN ) then
     alias cpaste_halligan 'bash ${CPASTE_HALLIGAN}'
     alias cpaste          'cpaste_halligan'
+endif
+
+if ( $?CODELINES ) then
+    alias codelines "bash '${CODELINES}'"
+    alias codel     'codelines'
+    alias cdl       'codelines'
 endif

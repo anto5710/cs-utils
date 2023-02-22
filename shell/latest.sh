@@ -1,10 +1,10 @@
 #!/bin/bash
 #=========================================================
-#                         nower
+#                        latest
 #=========================================================
 # Author: Chris Ahn (dahn01), Spring 2023, Tufts Univ.
 #
-THIS="now?"
+THIS="latest"
 USAGE=\
 "Usage: ${THIS} [-h|-q]
  Args:  -h: Help
@@ -13,12 +13,10 @@ USAGE=\
 HELP=\
 "${THIS}: Bash script to inspect latest modified file(s) in current dir
 
-      Finds file(s) with the latest time (allows tie) stamp using \`ls -lt\`,
+      Computes file(s) with the latest time (allows tie) stamp using \`ls -lt\`,
       And reports the difference from current system time.
 
-${USAGE}
-
-"
+${USAGE}\n"
 #=========================================================
 
 ARGC=$#
@@ -85,7 +83,7 @@ for file in $(ls); do
 
     # Tie (include both)
     elif [ "${FILE_LAST_UNIXTIME}" -eq "${MAX_PWD_UNIXTIME}" ]; then
-        LATEST_FILES="${LATEST_FILES}  ${file}"
+        LATEST_FILES="${LATEST_FILES}\t${file}"
     fi
 done
 
@@ -154,15 +152,15 @@ if [ "${DIFF_HOUR}" -gt 24 ]; then
     DIFF_MSG="${ST_DAY}:${ST_HOUR}"
 fi
 
-MAX_FILES_DISPLAY=15
-
+#==============================================================
+# Print ls -lt if not turned off
+#==============================================================
 if [[ ${NO_LS_LT} != "true" ]]; then
     LINE="${W}----------------------------------------------------------${R}"
     echo -e "${LINE}"
-    echo -e "Top ${MAX_FILES_DISPLAY} files (out of $(ls -1 | wc -l)) ..."
-    ls -lt | head -${MAX_FILES_DISPLAY}
+    ls -lt
     echo -e "${LINE}"
 fi
 
-echo -e -n "${B}${THIS}:${R} last updated: ${I}${LATEST_FILES}${R} ${W}"
+echo -e -n "${B}${THIS}:${R} last updated: ${U}${I}${LATEST_FILES}${R} ${W}"
 echo -e "----${R} ${DIFF_MSG}:ago"

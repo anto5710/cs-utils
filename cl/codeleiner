@@ -1,12 +1,12 @@
 #!/bin/bash
-# 
+#
 # codeleiner
 # ------------------------------------------------------------------------------
 #
 # Author: Chris Ahn (dahn01)
 #
 #     A code width (<= 80 columns) and block height (<= 3) safeguard.
-# 
+#
 #     Scans given text input to enforce width limit per line,
 #     and height limit per each outermost closure {}.
 #
@@ -34,7 +34,7 @@ pad_center () {
     HALF_FILL_WIDTH="$(( NON_TEXT_WIDTH / 2 ))"
 
     for (( c=1; c<=${HALF_FILL_WIDTH}; c++ ))
-    do 
+    do
         HALF_FILL="${HALF_FILL}${FILLER}"
     done
 
@@ -57,8 +57,8 @@ dh_line () {
 
 print_title () {
     TEMP_LIST=($TARGETS)
-    
-    
+
+
     FILLER=" ";
 
     HALF_FILL=""
@@ -77,7 +77,7 @@ print_title () {
     HALF_FILL_WIDTH="$(( NON_TEXT_WIDTH / 2 ))"
 
     for (( c=1; c<=${HALF_FILL_WIDTH}; c++ ))
-    do 
+    do
         HALF_FILL="${HALF_FILL}${FILLER}"
     done
 
@@ -89,8 +89,8 @@ print_title () {
 
 print_end () {
     TEMP_LIST=($TARGETS)
-    
-    
+
+
     FILLER=" ";
 
     HALF_FILL=""
@@ -108,7 +108,7 @@ print_end () {
     HALF_FILL_WIDTH="$(( NON_TEXT_WIDTH / 2 ))"
 
     for (( c=1; c<=${HALF_FILL_WIDTH}; c++ ))
-    do 
+    do
         HALF_FILL="${HALF_FILL}${FILLER}"
     done
 
@@ -137,7 +137,7 @@ if [ $ARGC -eq 1 ] && [ $@ == "-update" ]
 then
     echo "codeleiner: updating from $EXEC.cpp:"
     if [ -f "$EXEC.cpp" ]
-    then 
+    then
         clang++ -o $EXEC "$EXEC.cpp"
         echo "codeleiner: successfully updated: $EXEC"
     else
@@ -154,7 +154,7 @@ SILENT="false"
 
 # But if no args, then go for defaults
 if [ $ARGC -eq 0 ]
-then 
+then
     TARGETS="$DEFAULTS"
     WARN="false"
 fi
@@ -164,7 +164,7 @@ then
     ARGC=$(( ${ARGC} - 1 ))
     WARN="false"
     SILENT="true"
-    
+
     if [ $ARGC -eq 0 ]
     then
         TARGETS="$DEFAULTS"
@@ -184,16 +184,16 @@ do
     then
         EXEC_OUTPUT="`$EXEC $arg`"
 
-        if [[ ! $(echo ${EXEC_OUTPUT} | grep -E '\[FAIL_\w+\]' ) == "" ]] 
+        if [[ ! $(echo ${EXEC_OUTPUT} | grep -E '\[FAIL_\w+\]' ) == "" ]]
         then
             FAIL_OUTPUTS=$(( 1 + ${FAIL_OUTPUTS} ))
-        else 
+        else
             PASS_OUTPUTS=$(( 1 + ${PASS_OUTPUTS} ))
             SH_OUTPUTf=${EXEC_OUTPUT}
         fi
 
     else
-        if [ $WARN == "true" ] 
+        if [ $WARN == "true" ]
         then echo "codeleiner: cannot find $arg"
         fi
     fi
@@ -214,7 +214,7 @@ FILLER="━"; TEXT="";
 pad_center
 
 if [ ${FAIL_OUTPUTS} -eq 0 ]
-then 
+then
     echo -e "\e[1;32m${PADDED}\e[m"
 else
     echo -e "\e[2;31m${PADDED}\e[m"
