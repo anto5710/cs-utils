@@ -2,8 +2,12 @@
 
 function init_new_file(filename)
 {
-        cdline_cnt=0;
-        in_cblock=0;
+        cdline_cnt = 0;
+        in_cblock  = 0;
+
+        if (length(filename) >= max_filename_l) {
+                max_filename_l = length(filename);
+        }
 
         ######################################################################
         # SELECT: comment block
@@ -114,7 +118,9 @@ BEGIN {
         file_i           = 1;
         last_file_i      = 0;
         uniq_file_n      = 0;
+
         max_cdline_cnt_l = 1;
+        max_filename_l   = 0;
 }
 # If not empty line
 length {
@@ -143,14 +149,14 @@ END {
                 line_map[ARGV[last_file_i]] = cdline_cnt;
         }
 
-        (uniq_file_n >= 2) ? sep = ":\t" : sep = ": ";
+        sep = ": ";
 
-        magenta_f = "\033[35m"
-        cyan_f    = "\033[36m"
-        reset_f   = "\033[m"
+        magenta_f = "\033[35m";
+        cyan_f    = "\033[36m";
+        reset_f   = "\033[m";
 
         for (file in line_map) {
-                printf("%s%s%s%s%s%"max_cdline_cnt_l"s\n",
+                printf("%s%-"max_filename_l"s%s%s%s%"max_cdline_cnt_l"s\n",
                        magenta_f, file           ,
                        cyan_f   , sep            ,
                        reset_f  , line_map[file]);

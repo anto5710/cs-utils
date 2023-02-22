@@ -20,7 +20,7 @@ if ( $?UTIL_HOME && -d "${UTIL_HOME}" ) then
     set NONON       = "${SHTOOL_HOME}/nonon.sh"
     set DEDUPLICATE = "${SHTOOL_HOME}/deduplicate.sh"
     set CPASTE_HALLIGAN = "${SHTOOL_HOME}/cpaste_halligan.sh"
-    set CODELINES   = "${SHTOOL_HOME}/codelines.sh"
+    set CODELINES   = "${UTIL_HOME}/awk/codelines.awk"
 endif
 
 #################################################################
@@ -149,7 +149,7 @@ if ( $?CPASTE_HALLIGAN ) then
 endif
 
 if ( $?CODELINES ) then
-    alias codelines "bash '${CODELINES}'"
+    alias codelines "awk -f '${CODELINES}'"
     alias codel     'codelines'
     alias cdl       'codelines'
 endif
