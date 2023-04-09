@@ -21,6 +21,7 @@ if ( $?UTIL_HOME && -d "${UTIL_HOME}" ) then
     set DEDUPLICATE = "${SHTOOL_HOME}/deduplicate.sh"
     set CPASTE_HALLIGAN = "${SHTOOL_HOME}/cpaste_halligan.sh"
     set CODELINES   = "${UTIL_HOME}/awk/codelines.awk"
+    set GITERHERO   = "${SHTOOL_HOME}/giterhero.sh"
 endif
 
 #################################################################
@@ -152,4 +153,22 @@ if ( $?CODELINES ) then
     alias codelines "awk -f '${CODELINES}'"
     alias codel     'codelines'
     alias cdl       'codelines'
+endif
+
+#################################################################
+## giterhero
+#################################################################
+if ( $?GITERHERO ) then
+    alias giterhero      'bash ${GITERHERO}'
+
+    alias gith           'giterhero'
+    alias gitpush        'giterhero -p'
+    alias gitp           'gitpush'
+
+    alias gitbranch      'giterhero -b'
+    alias gitb           'gitbranch'
+
+    alias gitmergemain   'giterhero -m'
+    alias gitmain        'gitmergemain'
+    alias gitm           'gitmergemain'
 endif
