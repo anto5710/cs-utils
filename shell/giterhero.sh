@@ -84,10 +84,10 @@ git_commit_all() {
                 git_default_commit_msg
         fi
 
-        font_weaken
+        font_weaken #==========================================================
         git add --all && git commit -m "${MSG}"
         COMMIT_RES="$?"
-        font_reset
+        font_reset #===========================================================
 
         if [[ "${COMMIT_RES}" -eq 0 ]]; then
                 echo -e "${HEADER}" \
