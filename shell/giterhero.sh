@@ -79,6 +79,8 @@ git_last_commit_msg() {
         LAST_MSG="$(git log -1 --pretty=%B)"
 }
 
+#==============================================================================
+# Commit everything with (provided/ or default) message
 git_commit_all() {
         if [[ -z "${MSG}" ]]; then
                 git_default_commit_msg
@@ -101,6 +103,8 @@ git_commit_all() {
 }
 
 #==============================================================================
+# Git push current commit in the branch
+# May return with failing (non=zero) return code if push interrupted/failed
 git_push() {
         font_weaken #==========================================================
         git_current_branch
@@ -199,27 +203,20 @@ git_merge_and_return() {
         git_checkout || return ${RETURN_FAIL}
 }
 
-#==============================================================================
-# NR style sub-argument parser
-READ_NEXT_ARG() {
-        ((I++))
-        OPT="${!I}"
-        if [[ -z "${OPT}" ]]; then
-                OPT="${OPT_DEFAULT}"
-        fi
-}
-
 CMD=""
 #==============================================================================
-# main loop. Parse and evaluate each args.
+# Parse each args. Lastly read command will be the only command to be run
+# May pick up optional args for some command in the process
 for ((I = 1; I <= "$#"; I++)); do
         arg="${!I}"
 
         case "${arg}" in
         -m* | --m*)
-                OPT_DEFAULT="main"
-                READ_NEXT_ARG
-                DEST_BRANCH="${OPT}"
+                ((I++))
+                DEST_BRANCH="${!I}"
+                if [[ -z "${DEST_BRANCH}" ]]; then
+                        DEST_BRANCH="main"
+                fi
                 CMD="${arg}"
                 ;;
         -*)
@@ -231,8 +228,10 @@ for ((I = 1; I <= "$#"; I++)); do
         esac
 done
 
+#==============================================================================
+# Runs the command selected above.
 case "${CMD}" in
--h | --h)
+-h* | --h*)
         usage_exit
         ;;
 -d* | --d*)
@@ -249,5 +248,8 @@ case "${CMD}" in
         ;;
 -m* | --m*)
         git_merge_and_return
+        ;;
+*)
+        echo "${BELL}"
         ;;
 esac
