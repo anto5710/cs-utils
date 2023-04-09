@@ -92,7 +92,7 @@ git_commit_all() {
         if [[ "${COMMIT_RES}" -eq 0 ]]; then
                 echo -e "${HEADER}" \
                         "${FG_GREEN}commiting --all with msg:\n" \
-                        "          \"${MSG}\"${RESET}"
+                        "  \"${MSG}\"${RESET}"
         else
                 echo -e "${HEADER}${FG_YELLOW} commit interrupted${RESET}"
         fi
