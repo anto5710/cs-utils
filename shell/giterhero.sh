@@ -209,36 +209,45 @@ READ_NEXT_ARG() {
         fi
 }
 
+CMD=""
 #==============================================================================
 # main loop. Parse and evaluate each args.
 for ((I = 1; I <= "$#"; I++)); do
         arg="${!I}"
 
         case "${arg}" in
-        -h | --h)
-                usage_exit
-                ;;
-        -d* | --d*)
-                git_diff_list
-                ;;
-        -c* | --c*)
-                git_commit_all
-                ;;
-        -b* | --b*)
-                git_current_branch
-                echo "${CURRENT_BRANCH}"
-                ;;
-        -p* | --p*)
-                git_commit_and_push
-                ;;
         -m* | --m*)
                 OPT_DEFAULT="main"
                 READ_NEXT_ARG
                 DEST_BRANCH="${OPT}"
-                git_merge_and_return
+                CMD="${arg}"
+                ;;
+        -*)
+                CMD="${arg}"
                 ;;
         *)
                 MSG="${arg}"
                 ;;
         esac
 done
+
+case "${CMD}" in
+-h | --h)
+        usage_exit
+        ;;
+-d* | --d*)
+        git_diff_list
+        ;;
+-c* | --c*)
+        git_commit_all
+        ;;
+-b* | --b*)
+        git_current_branch
+        ;;
+-p* | --p*)
+        git_commit_and_push
+        ;;
+-m* | --m*)
+        git_merge_and_return
+        ;;
+esac
